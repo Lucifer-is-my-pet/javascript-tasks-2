@@ -1,14 +1,10 @@
 'use strict';
 
+var phoneBook = []; // массив объектов
+
 var regPhone = /^\+*\d* *(\(\d{3}\)|\d{3}) *\d{3}( |-)*\d\2\d{3}$/;
 var regName = /([А-Яа-я]+)( \1| \d+)*/;
 var regEmail = /[\w\-]+@[a-zа-я\-]+\.[a-zа-я]+\.*[a-z]*/;
-
-var phoneBook = []; // массив объектов
-
-var justSearching = true;
-var forRemoving = [];
-
 /*
    Функция добавления записи в телефонную книгу.
    На вход может прийти что угодно, будьте осторожны.
@@ -65,6 +61,9 @@ module.exports.add = function add(name, phone, email) {
    Функция поиска записи в телефонной книге.
    Поиск ведется по всем полям.
 */
+var justSearching = true;
+var forRemoving = [];
+
 module.exports.find = function find(query) {
     if (query === '') {
         for (var i in phoneBook) {
