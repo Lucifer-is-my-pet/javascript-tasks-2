@@ -1,7 +1,7 @@
 'use strict';
 
 var regPhone = /^\+*\d* *(\(\d{3}\)|\d{3}) *\d{3}( |-)*\d\2\d{3}$/;
-var regName = /([А-Яа-я]+)( \1| \d+)*/; //с большой буквы как минимум одно слово
+var regName = /([А-Яа-я]+)( \1| \d+)*/;
 var regEmail = /[\w\-]+@[a-zа-я\-]+\.[a-zа-я]+\.*[a-z]*/;
 
 var phoneBook = []; // массив объектов
@@ -25,14 +25,15 @@ module.exports.add = function add(name, phone, email) {
         return;
     }
 
-    for (var i in phoneBook) { // типа забота о пользователе
+    // типа забота о пользователе. хотелось бы интерактивности, но со считыванием с консоли всё плохо
+    for (var i in phoneBook) {
         if (phoneBook[i].name === name) {
             console.log('Контакт с именем', name, 'уже имеется!');
             return;
         } else if (phoneBook[i].phone === phone) {
             console.log('Контакт с номером', phone, 'уже имеется!');
             return;
-        } else if (phoneBook[i] === email) {
+        } else if (phoneBook[i].email === email) {
             console.log('Контакт с почтой', email, 'уже имеется!');
             return;
         }
