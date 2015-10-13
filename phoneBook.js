@@ -2,8 +2,8 @@
 
 var phoneBook = []; // массив объектов
 
-var regPhone = /^\+*\d* *(\(\d{3}\)|\d{3}) *\d{3}( |-)*\d\2\d{3}$/;
-var regName = /([А-Яа-я]+)( \1| \d+)*/;
+var regPhone = /^\+*\d*\s*(\(\d{3}\)|\d{3})\s*\d{3}(\s|-)*\d\2\d{3}$/;
+var regName = /([a-zа-я]+)(\s\1|\s\d+)*/i;
 var regEmail = /[\w\-]+@[a-zа-я\-]+\.[a-zа-я]+\.*[a-z]*/;
 /*
    Функция добавления записи в телефонную книгу.
@@ -13,10 +13,12 @@ module.exports.add = function add(name, phone, email) {
     if (!regName.test(name)) {
         console.log('Неверное имя', name);
         return;
-    } else if (!regPhone.test(phone)) {
+    }
+    if (!regPhone.test(phone)) {
         console.log('Неверный номер телефона', phone);
         return;
-    } else if (!regEmail.test(email)) {
+    }
+    if (!regEmail.test(email)) {
         console.log('Неверный email-адрес', email);
         return;
     }
@@ -26,10 +28,12 @@ module.exports.add = function add(name, phone, email) {
         if (phoneBook[i].name === name) {
             console.log('Контакт с именем', name, 'уже имеется!');
             return;
-        } else if (phoneBook[i].phone === phone) {
+        }
+        if (phoneBook[i].phone === phone) {
             console.log('Контакт с номером', phone, 'уже имеется!');
             return;
-        } else if (phoneBook[i].email === email) {
+        }
+        if (phoneBook[i].email === email) {
             console.log('Контакт с почтой', email, 'уже имеется!');
             return;
         }
@@ -39,18 +43,11 @@ module.exports.add = function add(name, phone, email) {
         name: name,
         phone: phone,
         email: email,
-        glue: function () {
+        str: function () {
             return this.name + ', ' + this.phone + ', ' + this.email;
         },
         withoutSymbols: function () {
-            var tempArr = this.phone.split(' ');
-            var tempStr = tempArr.join('');
-            tempArr = this.phone.split('-');
-            tempStr = tempArr.join('');
-            tempArr = this.phone.split('(');
-            tempStr = tempArr.join('');
-            tempArr = this.phone.split(')');
-            tempStr = tempArr.join('');
+            var tempStr = this.phone.replace(/(\s|\-|\(|\))/g, '');
             return tempStr;
         }
     };
@@ -67,7 +64,7 @@ var forRemoving = [];
 module.exports.find = function find(query) {
     if (query === '') {
         for (var i in phoneBook) {
-            console.log((phoneBook[i].glue()));
+            console.log((phoneBook[i].str()));
         }
         return;
     }
@@ -75,7 +72,7 @@ module.exports.find = function find(query) {
     if (query.search(/[a-zа-я@]/i) === -1) { // запрос - телефон
         for (var i in phoneBook) {
             if (phoneBook[i].withoutSymbols().indexOf(query) > -1 && justSearching) {
-                console.log((phoneBook[i].glue()));
+                console.log((phoneBook[i].str()));
             } else if (phoneBook[i].withoutSymbols().indexOf(query) > -1) {
                 forRemoving.push(i);
             }
@@ -85,7 +82,7 @@ module.exports.find = function find(query) {
     for (var i in phoneBook) {
         if ((phoneBook[i].name.indexOf(query) > -1 || phoneBook[i].email.indexOf(query) > -1) &&
             justSearching) {
-            console.log((phoneBook[i].glue()));
+            console.log((phoneBook[i].str()));
         } else if (phoneBook[i].name.indexOf(query) > -1 ||
             phoneBook[i].email.indexOf(query) > -1) {
             forRemoving.push(i);
@@ -124,7 +121,5 @@ module.exports.importFromCsv = function importFromCsv(filename) {
    Функция вывода всех телефонов в виде ASCII (задача со звёздочкой!).
 */
 module.exports.showTable = function showTable() {
-
-    // Ваша чёрная магия здесь
 
 };
