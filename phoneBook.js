@@ -1,6 +1,6 @@
 'use strict';
 
-var phoneBook = []; // массив объектов
+var phoneBook = [];
 
 var regPhone = /^\+*\d*\s*(\(\d{3}\)|\d{3})\s*\d{3}(\s|-)*\d\2\d{3}$/;
 var regName = /([a-zа-я]+)(\s\1|\s\d+)*/i;
@@ -43,12 +43,11 @@ module.exports.add = function add(name, phone, email) {
         name: name,
         phone: phone,
         email: email,
-        str: function () {
-            return this.name + ', ' + this.phone + ', ' + this.email;
+        print: function () {
+            console.log(this.name + ', ' + this.phone + ', ' + this.email);
         },
-        withoutSymbols: function () {
-            var tempStr = this.phone.replace(/(\s|\-|\(|\))/g, '');
-            return tempStr;
+        sanitizePhone: function () {
+            return this.phone.replace(/(\s|\-|\(|\))/g, '');
         }
     };
     phoneBook.push(newRecord);
@@ -59,33 +58,34 @@ module.exports.add = function add(name, phone, email) {
    Поиск ведется по всем полям.
 */
 var justSearching = true;
-var forRemoving = [];
+var removeQueue = [];
 
 module.exports.find = function find(query) {
     if (query === '') {
         for (var i in phoneBook) {
-            console.log((phoneBook[i].str()));
+            phoneBook[i].print();
         }
         return;
     }
 
     if (query.search(/[a-zа-я@]/i) === -1) { // запрос - телефон
         for (var i in phoneBook) {
-            if (phoneBook[i].withoutSymbols().indexOf(query) > -1 && justSearching) {
-                console.log((phoneBook[i].str()));
-            } else if (phoneBook[i].withoutSymbols().indexOf(query) > -1) {
-                forRemoving.push(i);
+            var foundnumber = phoneBook[i].sanitizePhone().indexOf(query) > -1;
+            if (foundnumber && justSearching) {
+                phoneBook[i].print();
+            } else if (foundnumber) {
+                removeQueue.push(i);
             }
         }
         return;
     }
     for (var i in phoneBook) {
-        if ((phoneBook[i].name.indexOf(query) > -1 || phoneBook[i].email.indexOf(query) > -1) &&
-            justSearching) {
-            console.log((phoneBook[i].str()));
-        } else if (phoneBook[i].name.indexOf(query) > -1 ||
-            phoneBook[i].email.indexOf(query) > -1) {
-            forRemoving.push(i);
+        var foundNameOrEmail = phoneBook[i].name.indexOf(query) > -1 ||
+            phoneBook[i].email.indexOf(query) > -1;
+        if (foundNameOrEmail && justSearching) {
+            phoneBook[i].print();
+        } else if (foundNameOrEmail) {
+            removeQueue.push(i);
         }
     }
 };
@@ -96,14 +96,14 @@ module.exports.find = function find(query) {
 module.exports.remove = function remove(query) {
     justSearching = false;
     this.find(query);
-    var removed = 0;
-    if (forRemoving.length != 0) {
-        for (var i in forRemoving) {
-            phoneBook.splice(forRemoving[i], 1);
-            removed++;
+    var removedRecords = 0;
+    if (removeQueue.length != 0) {
+        for (var i in removeQueue) {
+            phoneBook.splice(removeQueue[i], 1);
+            removedRecords++;
         }
     }
-    console.log('Контактов удалено:', removed);
+    console.log('Контактов удалено:', removedRecords);
 };
 
 /*
