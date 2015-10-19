@@ -1,6 +1,6 @@
 'use strict';
 
-var phoneBook = require('./phone-book'); //phoneBook?
+var phoneBook = require('./phoneBook'); //phoneBook?
 
 // Добавляем записи
 phoneBook.add('Сергей', '7 999 6667778', 'gs@example.com');
@@ -20,7 +20,7 @@ phoneBook.remove('Олег');
 // Удален 1 контакт
 
 // Выводит записи в виде красивой таблички
-//phoneBook.showTable();
+phoneBook.showTable('');
 // Выводит
 // ┌─────────────┬────────────────────╥──────────────────┐
 // │ Имя         │ Телефон            ║ email            │
