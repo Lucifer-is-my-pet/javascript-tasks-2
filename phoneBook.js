@@ -2,8 +2,8 @@
 
 var phoneBook = [];
 
-var regPhone = /^\+*\d*\s*(\(\d{3}\)|\d{3})\s*\d{3}(\s|-)*\d\2\d{3}$/;
-var regName = /[a-zа-я \d]+/i;
+var regPhone = /^\+?\d*\s*(\(\d{3}\)|\d{3})\s*\d{3}(\s|-)*\d\2\d{3}$/;
+var regName = /[a-zа-я\s\d]+/i;
 var regEmail = /[\w\-]+@[a-zа-я\-]+\.[a-zа-я]+\.*[a-z]*/i;
 /*
    Функция добавления записи в телефонную книгу.
@@ -11,30 +11,31 @@ var regEmail = /[\w\-]+@[a-zа-я\-]+\.[a-zа-я]+\.*[a-z]*/i;
 */
 module.exports.add = function add(name, phone, email) {
     if (!regName.test(name)) {
-        console.log('Неверное имя', name);
+        console.error('Неверное имя', name);
         return;
     }
     if (!regPhone.test(phone)) {
-        console.log('Неверный номер телефона', phone);
+        console.error('Неверный номер телефона', phone);
         return;
     }
     if (!regEmail.test(email)) {
-        console.log('Неверный email-адрес', email);
+        console.error('Неверный email-адрес', email);
         return;
     }
 
     // типа забота о пользователе. хотелось бы интерактивности, но со считыванием с консоли всё плохо
     for (var i in phoneBook) {
-        if (phoneBook[i].name === name) {
-            console.log('Контакт с именем', name, 'уже имеется!');
+        var currentRecord = phoneBook[i];
+        if (currentRecord.name === name) {
+            console.error('Контакт с именем', name, 'уже имеется!');
             return;
         }
-        if (phoneBook[i].phone === phone) {
-            console.log('Контакт с номером', phone, 'уже имеется!');
+        if (currentRecord.phone === phone) {
+            console.error('Контакт с номером', phone, 'уже имеется!');
             return;
         }
-        if (phoneBook[i].email === email) {
-            console.log('Контакт с почтой', email, 'уже имеется!');
+        if (currentRecord.email === email) {
+            console.error('Контакт с почтой', email, 'уже имеется!');
             return;
         }
     }
@@ -97,7 +98,7 @@ module.exports.remove = function remove(query) {
     justSearching = false;
     this.find(query);
     var removedRecords = 0;
-    if (removeQueue.length != 0) {
+    if (removeQueue.length !== 0) {
         for (var i in removeQueue) {
             phoneBook.splice(removeQueue[i], 1);
             removedRecords++;
