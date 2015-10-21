@@ -3,14 +3,23 @@
 var phoneBook = [];
 
 var regPhone = /^\+?\d*\s*(\(\d{3}\)|\d{3})\s*\d{3}(\s|-)*\d\2\d{3}$/;
-var regName = /[a-zа-я\s\d]+/i;
+var regName = /[a-zа-я\d]+/i;
 var regEmail = /[\w\-]+@[a-zа-я\-]+\.[a-zа-я]+\.*[a-z]*/i;
 /*
    Функция добавления записи в телефонную книгу.
    На вход может прийти что угодно, будьте осторожны.
 */
+function checkName(splittedName) {
+    for (var i in splittedName) {
+        if (!regName.test(splittedName[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 module.exports.add = function add(name, phone, email) {
-    if (!regName.test(name)) {
+    if (!checkName(name.split(" "))) {
         console.error('Неверное имя', name);
         return;
     }
@@ -61,9 +70,18 @@ module.exports.add = function add(name, phone, email) {
 var justSearching = true;
 var removeQueue = [];
 
+function printOrAddToQueue(index) {
+    if (justSearching) {
+        phoneBook[index].print();
+    } else {
+        removeQueue.push(index);
+    }
+}
+
 module.exports.find = function find(query) {
     if (query === '') {
         for (var i in phoneBook) {
+            var currentRecord = phoneBook[i];
             phoneBook[i].print();
         }
         return;
@@ -71,22 +89,17 @@ module.exports.find = function find(query) {
 
     if (query.search(/[a-zа-я@]/i) === -1) { // запрос - телефон
         for (var i in phoneBook) {
-            var foundnumber = phoneBook[i].sanitizePhone().indexOf(query) > -1;
-            if (foundnumber && justSearching) {
-                phoneBook[i].print();
-            } else if (foundnumber) {
-                removeQueue.push(i);
+            currentRecord = phoneBook[i];
+            if (currentRecord.sanitizePhone().indexOf(query) > -1) {
+                printOrAddToQueue(i);
             }
         }
         return;
     }
     for (var i in phoneBook) {
-        var foundNameOrEmail = phoneBook[i].name.indexOf(query) > -1 ||
-            phoneBook[i].email.indexOf(query) > -1;
-        if (foundNameOrEmail && justSearching) {
-            phoneBook[i].print();
-        } else if (foundNameOrEmail) {
-            removeQueue.push(i);
+        currentRecord = phoneBook[i];
+        if (currentRecord.name.indexOf(query) > -1 || currentRecord.email.indexOf(query) > -1) {
+            printOrAddToQueue(i);
         }
     }
 };
